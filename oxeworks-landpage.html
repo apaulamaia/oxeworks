@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>oxeworks — Impressão 3D · Portugal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --oxe: #D10000;
+  --works: #0047B3;
+  --black: #070707;
+  --surface: #0f0f0f;
+  --card: #141414;
+  --border: rgba(255,255,255,0.06);
+  --white: #F2F2EE;
+  --mid: #555;
+  --text: #999;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Share Tech Mono', monospace;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+.cursor {
+  width: 8px; height: 8px;
+  background: var(--oxe);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.15s ease;
+  transform: translate(-50%,-50%);
+}
+.cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(209,0,0,0.4);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: all 0.25s ease;
+}
+body:hover .cursor { opacity:1; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  background: rgba(7,7,7,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.nav-logo .o { color: var(--oxe); }
+.nav-logo .w { color: var(--works); }
+
+.nav-links {
+  display: flex; gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 10px; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--mid);
+  text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+
+.nav-cta {
+  background: var(--oxe);
+  color: #fff; border: none;
+  padding: 10px 22px; border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.25em;
+  text-transform: uppercase; cursor: none;
+  transition: opacity 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: center;
+  padding: 0 48px;
+  position: relative; overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 50% 60% at 80% 50%, rgba(0,71,179,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 50% at 15% 80%, rgba(209,0,0,0.1) 0%, transparent 60%);
+}
+
+.hero-grid {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hero-noise {
+  position: absolute; inset: 0; z-index: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+.hero-tag {
+  font-size: 10px; letter-spacing: 0.4em;
+  color: var(--mid); text-transform: uppercase;
+  margin-bottom: 24px;
+  position: relative; z-index: 2;
+  animation: fadeUp 0.8s ease forwards; opacity: 0;
+}
+.hero-tag::before { content: '// '; color: var(--oxe); }
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 12vw, 160px);
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+  position: relative; z-index: 2;
+  animation: fadeUp 0.8s 0.1s ease forwards; opacity: 0;
+}
+.hero-title .line1 { display: block; }
+.hero-title .line2 { display: block; color: var(--oxe); }
+.hero-title .line3 { display: block; color: var(--works); }
+
+.hero-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px; font-weight: 300;
+  color: var(--text); line-height: 1.7;
+  max-width: 480px;
+  margin-top: 28px;
+  position: relative; z-index: 2;
+  animation: fadeUp 0.8s 0.2s ease forwards; opacity: 0;
+}
+
+.hero-actions {
+  display: flex; gap: 14px; margin-top: 36px;
+  position: relative; z-index: 2;
+  animation: fadeUp 0.8s 0.3s ease forwards; opacity: 0;
+}
+.btn-primary {
+  background: var(--oxe); color: #fff;
+  padding: 14px 32px; border: none; border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.25em;
+  text-transform: uppercase; cursor: none;
+  text-decoration: none; display: inline-block;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-outline {
+  border: 1px solid rgba(255,255,255,0.15); color: var(--white);
+  padding: 14px 32px; border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.25em;
+  text-transform: uppercase; cursor: none;
+  text-decoration: none; display: inline-block;
+  transition: border-color 0.2s;
+}
+.btn-outline:hover { border-color: rgba(255,255,255,0.4); }
+
+/* hero stats */
+.hero-stats {
+  position: absolute; bottom: 48px; right: 48px;
+  display: flex; gap: 40px;
+  z-index: 2;
+  animation: fadeUp 0.8s 0.5s ease forwards; opacity: 0;
+}
+.hero-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 40px; line-height: 1;
+  background: linear-gradient(135deg, var(--oxe), var(--works));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-stat-label {
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--mid); text-transform: uppercase; margin-top: 2px;
+}
+
+/* vertical text */
+.hero-vert {
+  position: absolute; left: 16px; top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  font-size: 9px; letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.1); text-transform: uppercase;
+  z-index: 2; white-space: nowrap;
+}
+
+/* scroll indicator */
+.scroll-hint {
+  position: absolute; bottom: 48px; left: 48px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 9px; letter-spacing: 0.25em;
+  color: var(--mid); text-transform: uppercase;
+  z-index: 2;
+  animation: fadeUp 0.8s 0.6s ease forwards; opacity: 0;
+}
+.scroll-line {
+  width: 32px; height: 1px;
+  background: linear-gradient(90deg, var(--oxe), transparent);
+  animation: scrollPulse 2s infinite;
+}
+@keyframes scrollPulse { 0%,100%{opacity:0.4;} 50%{opacity:1;} }
+
+/* ── TICKER ── */
+.ticker-wrap {
+  overflow: hidden; border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface); padding: 14px 0;
+}
+.ticker-inner {
+  display: flex; gap: 0;
+  animation: ticker 25s linear infinite;
+  white-space: nowrap;
+}
+.ticker-item {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 0.08em;
+  padding: 0 32px; color: var(--mid);
+  display: flex; align-items: center; gap: 16px;
+  flex-shrink: 0;
+}
+.ticker-item .dot { color: var(--oxe); font-size: 10px; }
+@keyframes ticker { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+/* ── SOBRE ── */
+.about {
+  padding: 120px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media(max-width:768px){ .about{ grid-template-columns:1fr; padding:80px 24px; gap:40px; } }
+
+.about-label {
+  font-size: 10px; letter-spacing: 0.4em;
+  color: var(--mid); text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.about-label::before { content: '// '; color: var(--oxe); }
+
+.about-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 0.95; letter-spacing: 0.01em;
+  margin-bottom: 28px;
+}
+.about-title span { color: var(--oxe); }
+
+.about-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; line-height: 1.8;
+  color: var(--text); margin-bottom: 20px;
+}
+
+.about-features {
+  display: flex; flex-direction: column; gap: 14px;
+  margin-top: 32px;
+}
+.feat-item {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; letter-spacing: 0.1em; color: var(--text);
+}
+.feat-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--oxe), var(--works));
+  flex-shrink: 0;
+}
+
+/* about visual */
+.about-visual {
+  position: relative;
+}
+.about-card-main {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+  aspect-ratio: 3/4;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.about-card-main::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--oxe), var(--works));
+}
+.about-card-inner {
+  text-align: center;
+}
+.about-card-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 60px; line-height: 1;
+}
+.about-card-logo .o { color: var(--oxe); }
+.about-card-logo .w { color: var(--works); }
+.about-card-sub {
+  font-size: 10px; letter-spacing: 0.35em;
+  color: var(--mid); text-transform: uppercase;
+  margin-top: 10px;
+}
+
+/* floating mini card */
+.about-card-float {
+  position: absolute; bottom: -20px; right: -20px;
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px; padding: 16px 20px;
+  min-width: 160px;
+}
+.float-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; line-height: 1;
+  color: var(--oxe);
+}
+.float-label {
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--mid); text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* grid bg on about card */
+.card-grid {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-size: 32px 32px;
+}
+.card-glow {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 30% 70%, rgba(209,0,0,0.12) 0%,transparent 60%),
+    radial-gradient(ellipse 70% 50% at 70% 30%, rgba(0,71,179,0.12) 0%,transparent 60%);
+}
+
+/* ── PORTFÓLIO ── */
+.portfolio {
+  padding: 80px 48px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+@media(max-width:768px){ .portfolio{ padding:60px 24px; } }
+
+.section-header {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 48px;
+  flex-wrap: wrap; gap: 20px;
+}
+.section-label {
+  font-size: 10px; letter-spacing: 0.4em;
+  color: var(--mid); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-label::before { content: '// '; color: var(--oxe); }
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 0.95;
+}
+.section-title span { color: var(--works); }
+
+/* product grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media(max-width:900px){ .products-grid{ grid-template-columns:repeat(2,1fr); } }
+@media(max-width:500px){ .products-grid{ grid-template-columns:1fr; } }
+
+.product-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s;
+  cursor: none;
+}
+.product-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-4px); }
+
+.product-img {
+  aspect-ratio: 1;
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+
+.product-img-inner {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px;
+}
+
+/* each product has a unique visual */
+.prod-icon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 80px; line-height: 1; opacity: 0.08;
+  position: absolute;
+}
+
+.prod-shape {
+  width: 80px; height: 80px;
+  position: relative; z-index: 1;
+}
+
+.product-info { padding: 20px; }
+.product-tag {
+  font-size: 8px; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--mid);
+  margin-bottom: 6px;
+}
+.product-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+.product-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; line-height: 1.6;
+  color: var(--text);
+}
+.product-price {
+  margin-top: 14px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+.price-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; color: var(--oxe);
+}
+.price-note { font-size: 9px; color: var(--mid); letter-spacing: 0.15em; }
+.btn-add {
+  background: none; border: 1px solid var(--border);
+  color: var(--white); padding: 8px 16px;
+  border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em;
+  text-transform: uppercase; cursor: none;
+  transition: all 0.2s;
+}
+.btn-add:hover { background: var(--oxe); border-color: var(--oxe); }
+
+/* product glow colors */
+.pg-red { background: radial-gradient(ellipse at 50% 50%, rgba(209,0,0,0.15), transparent 70%); }
+.pg-blue { background: radial-gradient(ellipse at 50% 50%, rgba(0,71,179,0.15), transparent 70%); }
+.pg-mix { background: radial-gradient(ellipse at 30% 70%, rgba(209,0,0,0.12), transparent 60%), radial-gradient(ellipse at 70% 30%, rgba(0,71,179,0.12), transparent 60%); }
+
+/* ── PROCESSO ── */
+.process {
+  padding: 120px 48px;
+  max-width: 1200px; margin: 0 auto;
+}
+@media(max-width:768px){ .process{ padding:80px 24px; } }
+
+.process-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 48px;
+  position: relative;
+}
+.process-steps::before {
+  content: '';
+  position: absolute;
+  top: 28px; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--oxe), var(--works));
+  z-index: 0;
+}
+@media(max-width:700px){ .process-steps{ grid-template-columns:repeat(2,1fr); gap:32px; } .process-steps::before{ display:none; } }
+
+.step {
+  text-align: center; position: relative; z-index: 1;
+  padding: 0 16px;
+}
+.step-num {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+  position: relative;
+}
+.step:nth-child(1) .step-num { border-color: var(--oxe); color: var(--oxe); }
+.step:nth-child(2) .step-num { border-color: rgba(209,0,0,0.5); color: rgba(209,0,0,0.7); }
+.step:nth-child(3) .step-num { border-color: rgba(0,71,179,0.5); color: rgba(0,71,179,0.7); }
+.step:nth-child(4) .step-num { border-color: var(--works); color: var(--works); }
+
+.step-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 0.05em; margin-bottom: 8px;
+}
+.step-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; line-height: 1.6; color: var(--text);
+}
+
+/* ── CONTACTO ── */
+.contact {
+  padding: 120px 48px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+@media(max-width:768px){ .contact{ padding:80px 24px; } }
+
+.contact-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start;
+}
+@media(max-width:768px){ .contact-inner{ grid-template-columns:1fr; gap:40px; } }
+
+.contact-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px,5vw,64px);
+  line-height: 0.95; margin-bottom: 20px;
+}
+.contact-title .red { color: var(--oxe); }
+.contact-title .blue { color: var(--works); }
+
+.contact-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; line-height: 1.75;
+  color: var(--text); margin-bottom: 32px;
+}
+
+.contact-info { display: flex; flex-direction: column; gap: 16px; }
+.info-row {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: var(--text);
+}
+.info-icon {
+  width: 32px; height: 32px; border-radius: 2px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+
+/* form */
+.contact-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:500px){ .form-row{ grid-template-columns:1fr; } }
+
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 9px; letter-spacing: 0.25em;
+  color: var(--mid); text-transform: uppercase;
+}
+.form-input, .form-textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 12px 14px;
+  color: var(--white);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-input:focus, .form-textarea:focus { border-color: rgba(209,0,0,0.5); }
+.form-textarea { min-height: 100px; resize: vertical; }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--mid); }
+
+.submit-btn {
+  background: linear-gradient(90deg, var(--oxe), #a80000);
+  color: #fff; border: none;
+  padding: 14px 32px; border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.25em;
+  text-transform: uppercase; cursor: none;
+  transition: opacity 0.2s; width: 100%;
+}
+.submit-btn:hover { opacity: 0.85; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 32px 48px;
+  background: var(--black);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+}
+.footer-logo .o { color: var(--oxe); }
+.footer-logo .w { color: var(--works); }
+.footer-copy {
+  font-size: 10px; letter-spacing: 0.2em;
+  color: var(--mid); text-transform: uppercase;
+}
+.footer-socials { display: flex; gap: 16px; }
+.social-link {
+  font-size: 10px; letter-spacing: 0.2em;
+  color: var(--mid); text-decoration: none;
+  text-transform: uppercase; transition: color 0.2s;
+}
+.social-link:hover { color: var(--white); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── MOBILE NAV ── */
+@media(max-width:768px){
+  nav { padding: 0 24px; }
+  .nav-links { display:none; }
+  .hero { padding: 0 24px; }
+  .hero-stats { right:24px; gap:24px; }
+  .hero-vert { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="curRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo"><span class="o">oxe</span><span class="w">works</span></a>
+  <ul class="nav-links">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#portfolio">Portfólio</a></li>
+    <li><a href="#processo">Processo</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Pedir Orçamento</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-noise"></div>
+  <div class="hero-vert">Impressão 3D · Portugal · 2025</div>
+
+  <div class="hero-tag">Impressão 3D · Portugal · @oxeworks</div>
+
+  <h1 class="hero-title">
+    <span class="line1">Do conceito</span>
+    <span class="line2">ao objeto</span>
+    <span class="line3">real.</span>
+  </h1>
+
+  <p class="hero-sub">Transformamos as tuas ideias em peças únicas com precisão milimétrica. Protótipos, peças funcionais e encomendas personalizadas — entregues em todo o Portugal.</p>
+
+  <div class="hero-actions">
+    <a href="#portfolio" class="btn-primary">Ver Portfólio</a>
+    <a href="#contacto" class="btn-outline">Pedir Orçamento</a>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">48h</div>
+      <div class="hero-stat-label">Resposta</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">100%</div>
+      <div class="hero-stat-label">Português</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">∞</div>
+      <div class="hero-stat-label">Possibilidades</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <div class="ticker-item"><span class="dot">◆</span> Impressão 3D <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Portugal <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Protótipos <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Peças Únicas <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Encomendas <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Orçamento 48h <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Envios Nacionais <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> oxeworks <span class="dot">◆</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item"><span class="dot">◆</span> Impressão 3D <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Portugal <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Protótipos <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Peças Únicas <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Encomendas <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Orçamento 48h <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> Envios Nacionais <span class="dot">◆</span></div>
+    <div class="ticker-item"><span class="dot">◆</span> oxeworks <span class="dot">◆</span></div>
+  </div>
+</div>
+
+<!-- SOBRE -->
+<section class="about" id="sobre">
+  <div class="reveal">
+    <div class="about-label">Sobre nós</div>
+    <h2 class="about-title">Criamos o que<br><span>imaginas.</span></h2>
+    <p class="about-text">A oxeworks é uma empresa portuguesa especializada em impressão 3D de precisão. Trabalhamos com designers, engenheiros, artistas e empreendedores que precisam de transformar ideias em realidade.</p>
+    <p class="about-text">Da fase de protótipo à produção final — estamos aqui para materializar cada detalhe do teu projeto.</p>
+    <div class="about-features">
+      <div class="feat-item"><div class="feat-dot"></div> Materiais de alta qualidade — PLA, PETG, ABS, Resina</div>
+      <div class="feat-item"><div class="feat-dot"></div> Peças funcionais e decorativas</div>
+      <div class="feat-item"><div class="feat-dot"></div> Orçamento em 48 horas</div>
+      <div class="feat-item"><div class="feat-dot"></div> Envios para todo o Portugal</div>
+      <div class="feat-item"><div class="feat-dot"></div> Projeto personalizado do zero</div>
+    </div>
+  </div>
+
+  <div class="about-visual reveal">
+    <div class="about-card-main">
+      <div class="card-grid"></div>
+      <div class="card-glow"></div>
+      <div class="about-card-inner" style="position:relative;z-index:1;">
+        <div class="about-card-logo"><span class="o">oxe</span><span class="w">works</span></div>
+        <div class="about-card-sub">Impressão 3D · Portugal</div>
+      </div>
+    </div>
+    <div class="about-card-float">
+      <div class="float-num">3D</div>
+      <div class="float-label">Print Precision</div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFÓLIO -->
+<section class="portfolio" id="portfolio">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-label">Portfólio</div>
+        <h2 class="section-title">O que<br><span>criamos</span></h2>
+      </div>
+      <a href="#contacto" class="btn-outline">Encomenda Personalizada</a>
+    </div>
+
+    <div class="products-grid">
+
+      <!-- Card 1 -->
+      <div class="product-card reveal">
+        <div class="product-img">
+          <div class="pg-red" style="position:absolute;inset:0;"></div>
+          <div class="product-img-inner">
+            <div class="prod-icon">⬡</div>
+            <svg class="prod-shape" viewBox="0 0 80 80">
+              <polygon points="40,5 75,22 75,58 40,75 5,58 5,22" fill="none" stroke="#D10000" stroke-width="1.5" opacity="0.6"/>
+              <polygon points="40,15 65,27 65,53 40,65 15,53 15,27" fill="none" stroke="#D10000" stroke-width="1" opacity="0.3"/>
+              <circle cx="40" cy="40" r="4" fill="#D10000"/>
+            </svg>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-tag">Decoração · PLA</div>
+          <div class="product-name">Peça Geométrica</div>
+          <div class="product-desc">Estruturas geométricas personalizadas para decoração de interiores. Acabamento premium, várias cores disponíveis.</div>
+          <div class="product-price">
+            <div>
+              <div class="price-val">Desde 12€</div>
+              <div class="price-note">por unidade</div>
+            </div>
+            <button class="btn-add" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Encomendar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card reveal">
+        <div class="product-img">
+          <div class="pg-blue" style="position:absolute;inset:0;"></div>
+          <div class="product-img-inner">
+            <div class="prod-icon">⬢</div>
+            <svg class="prod-shape" viewBox="0 0 80 80">
+              <rect x="15" y="15" width="50" height="50" rx="4" fill="none" stroke="#0047B3" stroke-width="1.5" opacity="0.6"/>
+              <rect x="25" y="25" width="30" height="30" rx="2" fill="none" stroke="#0047B3" stroke-width="1" opacity="0.3"/>
+              <rect x="33" y="33" width="14" height="14" rx="1" fill="#0047B3" opacity="0.5"/>
+            </svg>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-tag">Protótipo · PETG</div>
+          <div class="product-name">Protótipo Industrial</div>
+          <div class="product-desc">Protótipos funcionais para testes e validação de conceitos. Material resistente, tolerâncias precisas.</div>
+          <div class="product-price">
+            <div>
+              <div class="price-val">Orçamento</div>
+              <div class="price-note">personalizado</div>
+            </div>
+            <button class="btn-add" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Encomendar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card reveal">
+        <div class="product-img">
+          <div class="pg-mix" style="position:absolute;inset:0;"></div>
+          <div class="product-img-inner">
+            <div class="prod-icon">◎</div>
+            <svg class="prod-shape" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="url(#grad1)" stroke-width="1.5" opacity="0.6"/>
+              <circle cx="40" cy="40" r="20" fill="none" stroke="url(#grad1)" stroke-width="1" opacity="0.3"/>
+              <circle cx="40" cy="40" r="6" fill="url(#grad1)"/>
+              <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#D10000"/>
+                  <stop offset="100%" stop-color="#0047B3"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-tag">Arte · Resina</div>
+          <div class="product-name">Peça Artística</div>
+          <div class="product-desc">Esculturas e peças artísticas únicas em resina. Alta definição de detalhes, acabamento liso ou texturado.</div>
+          <div class="product-price">
+            <div>
+              <div class="price-val">Desde 25€</div>
+              <div class="price-note">por peça</div>
+            </div>
+            <button class="btn-add" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Encomendar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="product-card reveal">
+        <div class="product-img">
+          <div class="pg-red" style="position:absolute;inset:0;"></div>
+          <div class="product-img-inner">
+            <div class="prod-icon">⬟</div>
+            <svg class="prod-shape" viewBox="0 0 80 80">
+              <path d="M40 8 L72 28 L72 52 L40 72 L8 52 L8 28 Z" fill="none" stroke="#D10000" stroke-width="1.5" opacity="0.5"/>
+              <path d="M40 20 L60 32 L60 48 L40 60 L20 48 L20 32 Z" fill="none" stroke="#D10000" stroke-width="1" opacity="0.25"/>
+              <path d="M40 30 L52 37 L52 43 L40 50 L28 43 L28 37 Z" fill="#D10000" opacity="0.4"/>
+            </svg>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-tag">Personalizado · ABS</div>
+          <div class="product-name">Peça Técnica</div>
+          <div class="product-desc">Componentes técnicos para mecanismos, suportes e encaixes. Material ABS resistente ao calor e impacto.</div>
+          <div class="product-price">
+            <div>
+              <div class="price-val">Orçamento</div>
+              <div class="price-note">sob medida</div>
+            </div>
+            <button class="btn-add" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Encomendar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="product-card reveal">
+        <div class="product-img">
+          <div class="pg-blue" style="position:absolute;inset:0;"></div>
+          <div class="product-img-inner">
+            <div class="prod-icon">◈</div>
+            <svg class="prod-shape" viewBox="0 0 80 80">
+              <rect x="10" y="10" width="60" height="60" rx="8" fill="none" stroke="#0047B3" stroke-width="1.5" opacity="0.5"/>
+              <circle cx="40" cy="40" r="18" fill="none" stroke="#0047B3" stroke-width="1" opacity="0.3"/>
+              <rect x="30" y="30" width="20" height="20" rx="3" fill="#0047B3" opacity="0.35"/>
+            </svg>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-tag">Design · PLA+</div>
+          <div class="product-name">Objeto de Design</div>
+          <div class="product-desc">Objetos de design contemporâneo para casa e escritório. Formas únicas que combinam estética e funcionalidade.</div>
+          <div class="product-price">
+            <div>
+              <div class="price-val">Desde 18€</div>
+              <div class="price-note">por unidade</div>
+            </div>
+            <button class="btn-add" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Encomendar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 — CTA card -->
+      <div class="product-card reveal" style="background:linear-gradient(135deg,rgba(209,0,0,0.08),rgba(0,71,179,0.08));border-color:rgba(255,255,255,0.1);">
+        <div class="product-img" style="background:transparent;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:24px;text-align:center;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;"><span style="color:#D10000;">oxe</span><span style="color:#0047B3;">works</span></div>
+            <div style="font-size:10px;letter-spacing:0.3em;color:var(--mid);text-transform:uppercase;">A tua ideia<br>é o limite</div>
+          </div>
+        </div>
+        <div class="product-info">
+          <div class="product-tag">Encomenda</div>
+          <div class="product-name">Projeto Personalizado</div>
+          <div class="product-desc">Tens um projeto em mente? Fala connosco. Transformamos qualquer ideia em realidade.</div>
+          <div class="product-price">
+            <div>
+              <div class="price-val">Grátis</div>
+              <div class="price-note">orçamento sem compromisso</div>
+            </div>
+            <button class="btn-add" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">Contactar</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROCESSO -->
+<section class="process" id="processo">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-label">Como funciona</div>
+      <h2 class="section-title">O processo<br><span style="color:var(--oxe)">é simples.</span></h2>
+    </div>
+  </div>
+
+  <div class="process-steps">
+    <div class="step reveal">
+      <div class="step-num">01</div>
+      <div class="step-title">Envia o projeto</div>
+      <div class="step-desc">Partilha o teu ficheiro 3D ou descreve a tua ideia por mensagem.</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">02</div>
+      <div class="step-title">Recebe orçamento</div>
+      <div class="step-desc">Em até 48h enviamos um orçamento detalhado sem compromisso.</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">03</div>
+      <div class="step-title">Aprovação</div>
+      <div class="step-desc">Confirmas a encomenda e iniciamos a produção imediatamente.</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">04</div>
+      <div class="step-title">Entrega</div>
+      <div class="step-desc">A tua peça chega a casa, pronta a usar. Envios para todo Portugal.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="contact" id="contacto">
+  <div class="contact-inner">
+    <div class="reveal">
+      <div class="section-label">Contacto</div>
+      <h2 class="contact-title">Vamos<br><span class="red">criar</span><br><span class="blue">juntos.</span></h2>
+      <p class="contact-text">Tens um projeto, uma ideia ou uma dúvida? Fala connosco — respondemos em menos de 48 horas com um orçamento personalizado e sem compromisso.</p>
+      <div class="contact-info">
+        <div class="info-row"><div class="info-icon">📍</div> Portugal</div>
+        <div class="info-row"><div class="info-icon">📱</div> Instagram: @oxeworks</div>
+        <div class="info-row"><div class="info-icon">⚡</div> Resposta em até 48h</div>
+        <div class="info-row"><div class="info-icon">📦</div> Envios para todo o país</div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="contact-form">
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Nome</label>
+            <input class="form-input" type="text" placeholder="O teu nome">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" placeholder="email@exemplo.pt">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Tipo de projeto</label>
+          <input class="form-input" type="text" placeholder="Ex: protótipo, peça decorativa, peça técnica...">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Descreve o teu projeto</label>
+          <textarea class="form-textarea" placeholder="Conta-nos o que precisas — dimensões, material, quantidade, prazo..."></textarea>
+        </div>
+        <button class="submit-btn" onclick="handleSubmit(this)">⚡ Pedir Orçamento Grátis</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span class="o">oxe</span><span class="w">works</span></div>
+  <div class="footer-copy">© 2025 oxeworks · Impressão 3D · Portugal</div>
+  <div class="footer-socials">
+    <a class="social-link" href="#">Instagram</a>
+    <a class="social-link" href="#">WhatsApp</a>
+  </div>
+</footer>
+
+<script>
+// Custom cursor
+const cur = document.getElementById('cur');
+const curRing = document.getElementById('curRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+});
+function animRing(){
+  rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+  curRing.style.left=rx+'px'; curRing.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button,.product-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ cur.style.transform='translate(-50%,-50%) scale(2)'; curRing.style.transform='translate(-50%,-50%) scale(1.5)'; });
+  el.addEventListener('mouseleave',()=>{ cur.style.transform='translate(-50%,-50%) scale(1)'; curRing.style.transform='translate(-50%,-50%) scale(1)'; });
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); } });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Form submit
+function handleSubmit(btn){
+  btn.textContent='✓ Mensagem Enviada!';
+  btn.style.background='linear-gradient(90deg,#16a34a,#15803d)';
+  btn.disabled=true;
+  setTimeout(()=>{
+    btn.textContent='⚡ Pedir Orçamento Grátis';
+    btn.style.background='';
+    btn.disabled=false;
+  },4000);
+}
+</script>
+</body>
+</html>
